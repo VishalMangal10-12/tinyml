@@ -1,0 +1,14 @@
+FROM python:3.7-slim AS compile-image
+COPY req.txt .
+RUN python3 -m pip install --user -r req.txt
+FROM python:3.7-slim AS build-image
+RUN apt-get update && apt-get install -y python3-opencv
+# RUN apt-get install -y --no-install-recommends build-essential gcc
+# RUN apt-get install ffmpeg libsm6 libxext6  -y
+# RUN apt-get install -y python3-opencv
+# RUN apt-get install -y libgl1-mesa-dev
+COPY --from=compile-image /root/.local /root/.local
+COPY . .
+# Make sure scripts in .local are usable:
+ENV PATH=/root/.local/bin:$PATH
+CMD ["python","app.py"]
